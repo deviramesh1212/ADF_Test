@@ -1,0 +1,96 @@
+{
+	"name": "dataflow_ALL_FUNCTIONS",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_SRC",
+						"type": "DatasetReference"
+					},
+					"name": "EMP"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_TGT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPLOYEE_ID as short,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as string,",
+				"          JOB_ID as string,",
+				"          SALARY as double,",
+				"          COMMISSION_PCT as double,",
+				"          MANAGER_ID as short,",
+				"          DEPARTMENT_ID as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> EMP",
+				"EMP cast(output(",
+				"          EMPLOYEE_ID as integer,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as date,",
+				"          JOB_ID as string,",
+				"          SALARY as decimal(10,2),",
+				"          COMMISSION_PCT as decimal(10,0),",
+				"          MANAGER_ID as integer,",
+				"          DEPARTMENT_ID as integer",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 derive(HIRE_DATE_NEW = addDays(HIRE_DATE,1),",
+				"          ADD_MONTHS = addMonths(HIRE_DATE,3),",
+				"          CASE = case(SALARY >= 10000,SALARY + 1000,SALARY + 5000),",
+				"          CONCAT = concat(FIRST_NAME,LAST_NAME),",
+				"          MD5 = md5(FIRST_NAME,LAST_NAME,EMAIL),",
+				"          CURRENT_TIMESTAMP = currentTimestamp(),",
+				"          DAYOFMONTH = dayOfMonth(HIRE_DATE),",
+				"          DAYOFWEEK = dayOfWeek(HIRE_DATE),",
+				"          GREATEROREQUAL = greaterOrEqual(length(FIRST_NAME),length(LAST_NAME)),",
+				"          IIFNULL = iif(length(FIRST_NAME) > length(LAST_NAME),FIRST_NAME,LAST_NAME),",
+				"          LIKE = like(FIRST_NAME,'S%'),",
+				"          SPLIT = split(PHONE_NUMBER, '.'),",
+				"          IIF_NULL = iifNull(COMMISSION_PCT,EMPLOYEE_ID,SALARY),",
+				"          ISNULL = iif(isNull(COMMISSION_PCT),'INSERT','UPDATE'),",
+				"          INSTR = instr(FIRST_NAME,'phen'),",
+				"          SUBSTR = substring(EMAIL,1,instr(EMAIL,'@'))) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_id as string,",
+				"          name as string",
+				"     ),",
+				"     partitionFileNames:['FUNCTIONS_EMP.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

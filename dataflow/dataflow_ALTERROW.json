@@ -1,0 +1,101 @@
+{
+	"name": "dataflow_ALTERROW",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_DEPT_SRC",
+						"type": "DatasetReference"
+					},
+					"name": "DEPARTMENTS"
+				},
+				{
+					"dataset": {
+						"referenceName": "Delimited_TGTDEPT",
+						"type": "DatasetReference"
+					},
+					"name": "TGTDEPARTMENTS"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_TGTDEPT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "cast2"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          DEPARTMENT_ID as short,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as short,",
+				"          LOCATION_ID as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> DEPARTMENTS",
+				"source(output(",
+				"          DEPARTMENT_ID as short,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as short,",
+				"          LOCATION_ID as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> TGTDEPARTMENTS",
+				"DEPARTMENTS cast(output(",
+				"          DEPARTMENT_ID as integer,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as integer,",
+				"          LOCATION_ID as integer",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"TGTDEPARTMENTS cast(output(",
+				"          DEPARTMENT_ID as integer,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as integer,",
+				"          LOCATION_ID as integer",
+				"     ),",
+				"     errors: true) ~> cast2",
+				"cast1, cast2 lookup(cast1@DEPARTMENT_ID == cast2@DEPARTMENT_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 alterRow(upsertIf(iif(cast2@DEPARTMENT_ID!=cast1@DEPARTMENT_ID,true(),false()))) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DEPARTMENT_ID as string,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as string,",
+				"          LOCATION_ID as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

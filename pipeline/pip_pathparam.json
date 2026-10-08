@@ -1,0 +1,119 @@
+{
+	"name": "pip_pathparam",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SRCDATA",
+						"type": "DatasetReference",
+						"parameters": {
+							"srcparamdata": {
+								"value": "@pipeline().parameters.SRCFILENAME",
+								"type": "Expression"
+							},
+							"srcparampath": {
+								"value": "@pipeline().parameters.SRCPATH",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "TGTDATA",
+						"type": "DatasetReference",
+						"parameters": {
+							"TGTPARAM": {
+								"value": "@pipeline().parameters.TGTFILENAME",
+								"type": "Expression"
+							},
+							"TGTPATH": {
+								"value": "@pipeline().parameters.TGTPATH",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"SRCFILENAME": {
+				"type": "string"
+			},
+			"SRCPATH": {
+				"type": "string"
+			},
+			"TGTFILENAME": {
+				"type": "string"
+			},
+			"TGTPATH": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"VARSRCFILE": {
+				"type": "String"
+			},
+			"VARSRCPATH": {
+				"type": "String"
+			},
+			"VARTGTFILE": {
+				"type": "String"
+			},
+			"VARTGTPATH": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "PARAMPATH"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-03T15:14:18Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

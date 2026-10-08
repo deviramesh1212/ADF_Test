@@ -1,0 +1,115 @@
+{
+	"name": "dataflow_DERIVED",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SRC_DERIVED",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_derived",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedText3",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedText4",
+						"type": "DatasetReference"
+					},
+					"name": "sink3"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "split1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPLOYEE_ID as string,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as string,",
+				"          JOB_ID as string,",
+				"          SALARY as string,",
+				"          COMMISSION_PCT as string,",
+				"          MANAGER_ID as string,",
+				"          DEPARTMENT_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source1 derive(COUNTRY_CODE = concat('+',PHONE_NUMBER),",
+				"          valid_nvalid_email = iif(substring(EMAIL, -10)=='@gmail.com','valid','invalid'),",
+				"     partitionBy('hash', 1)) ~> derivedColumn1",
+				"derivedColumn1 split(valid_nvalid_email=='valid',",
+				"     valid_nvalid_email=='invalid',",
+				"     disjoint: true) ~> split1@(emailvalid, EMAILINVALID, DEFAULT)",
+				"split1@emailvalid sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COUNTRY_ID as string,",
+				"          COUNTRY_NAME as string,",
+				"          REGION_ID as string",
+				"     ),",
+				"     partitionFileNames:['vaild_email.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1",
+				"split1@DEFAULT sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COUNTRY_ID as string,",
+				"          COUNTRY_NAME as string,",
+				"          REGION_ID as string",
+				"     ),",
+				"     partitionFileNames:['email_invalid.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink2",
+				"split1@EMAILINVALID sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COUNTRY_ID as string,",
+				"          COUNTRY_NAME as string,",
+				"          REGION_ID as string",
+				"     ),",
+				"     partitionFileNames:['tgt_emailinvalid.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink3"
+			]
+		}
+	}
+}

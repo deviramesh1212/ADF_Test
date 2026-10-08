@@ -1,0 +1,45 @@
+{
+	"name": "PIP_DELETE_CT_SOURCE",
+	"properties": {
+		"activities": [
+			{
+				"name": "Delete1",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DEL_PRAC",
+						"type": "DatasetReference"
+					},
+					"logStorageSettings": {
+						"linkedServiceName": {
+							"referenceName": "BlobLinkedService",
+							"type": "LinkedServiceReference"
+						},
+						"path": "data/source"
+					},
+					"enableLogging": true,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "LEARN"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-12-29T01:21:41Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

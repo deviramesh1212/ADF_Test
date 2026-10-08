@@ -1,0 +1,23 @@
+{
+	"name": "CLAIM_API",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"ClaimStatus": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().ClaimStatus",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

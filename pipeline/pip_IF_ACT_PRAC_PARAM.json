@@ -1,0 +1,137 @@
+{
+	"name": "pip_IF_ACT_PRAC_PARAM",
+	"properties": {
+		"activities": [
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@equals(pipeline().parameters.RUNLOAD, 1)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "MESSAGE",
+								"value": "'CHECKED MESSAGE'"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "BLOB_IF_PARAM",
+									"type": "DatasetReference",
+									"parameters": {
+										"FILE_NAME_SRC": {
+											"value": "@pipeline().parameters.FILE_NAME_SRC",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "BLOB_IF_PARAM_ACTIVITY",
+									"type": "DatasetReference",
+									"parameters": {
+										"FOLDER_NAME": {
+											"value": "@pipeline().parameters.FOLDER_NAME_TGT",
+											"type": "Expression"
+										},
+										"FILE_NAME": {
+											"value": "@pipeline().parameters.FILE_NAME_TGT",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"RUNLOAD": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"FILE_NAME_SRC": {
+				"type": "string"
+			},
+			"FOLDER_NAME_TGT": {
+				"type": "string"
+			},
+			"FILE_NAME_TGT": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"MESSAGE": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "PARAMPATH"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-25T03:31:19Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

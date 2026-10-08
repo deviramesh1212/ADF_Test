@@ -1,0 +1,79 @@
+{
+	"name": "pip_DB_COUNTRY_QUERY_PARAM",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Oracle_QUERY",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "TGT_COUNTRY_DB",
+						"type": "DatasetReference",
+						"parameters": {
+							"TGT_TABLE": {
+								"value": "@pipeline().parameters.TGTTABLE",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"SRCTABLE": {
+				"type": "string"
+			},
+			"TGTTABLE": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ORACLE_HR"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-22T03:54:04Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,24 @@
+{
+	"name": "AzureSqlTable6",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TABLE_SRC": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": {
+				"value": "@dataset().TABLE_SRC",
+				"type": "Expression"
+			}
+		}
+	}
+}

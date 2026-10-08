@@ -1,0 +1,169 @@
+{
+	"name": "pip_DB_PARAM_PRAC_QUERY_NEW",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DB_PARAM_PRAC",
+						"type": "DatasetReference",
+						"parameters": {
+							"TABLE_NAME": {
+								"value": "@pipeline().parameters.SOURCE_DB",
+								"type": "Expression"
+							},
+							"SCHEMA": {
+								"value": "@pipeline().parameters.SRC_SCHEMA",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "BLOB_DB_EMP_PRAC",
+						"type": "DatasetReference",
+						"parameters": {
+							"TGT_PARAM_EMP": {
+								"value": "@pipeline().parameters.TARGET_DB",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"oracleReaderQuery": "SELECT * FROM DEPARTMENTS WHERE DEPARTMENT_ID = 50",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"dataset": {
+						"referenceName": "LKP_DB",
+						"type": "DatasetReference",
+						"parameters": {
+							"LKP_TABLE_NAME": {
+								"value": "@pipeline().parameters.LKP_TABLE_NAME_P",
+								"type": "Expression"
+							},
+							"LKP_SCHEMA_NAME": "HR"
+						}
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "VARIDEPTID",
+					"value": {
+						"value": "@variables('VARDEPTNEW')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"SOURCE_DB": {
+				"type": "string"
+			},
+			"TARGET_DB": {
+				"type": "string"
+			},
+			"SRC_SCHEMA": {
+				"type": "string"
+			},
+			"LKP_TABLE_NAME_P": {
+				"type": "string"
+			},
+			"LKP_SCHEMA_P": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"VARIDEPTID": {
+				"type": "String"
+			},
+			"VARDEPTNEW": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ORACLE_HR"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-24T04:16:42Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

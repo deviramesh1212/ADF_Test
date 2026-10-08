@@ -1,0 +1,94 @@
+{
+	"name": "dataflow_WINDOW",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_SRC",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_TGT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "window1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPLOYEE_ID as integer,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as string,",
+				"          JOB_ID as string,",
+				"          SALARY as double,",
+				"          COMMISSION_PCT as double,",
+				"          MANAGER_ID as short,",
+				"          DEPARTMENT_ID as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 window(asc(SALARY, true),",
+				"     NEXT_SALARY = lead(SALARY),",
+				"          LAST_SALARY = lag(SALARY),",
+				"          LAG_UNBOUNDED = lag(SALARY,2),",
+				"          LEAD_UNBOUNDED = lead(SALARY, 2),",
+				"          DENSE_RANK = denseRank(),",
+				"          ROW_NUMBER = rowNumber(),",
+				"          RANK = rank(),",
+				"          SUM = sum(SALARY),",
+				"          COUNT = count(EMPLOYEE_ID),",
+				"          AVERAGE = avg(SALARY),",
+				"          FIRST_VALUE = first(DEPARTMENT_ID),",
+				"          LAST_VALUE = last(DEPARTMENT_ID),",
+				"          MIN = min(SALARY),",
+				"          MAX = max(SALARY)) ~> window1",
+				"window1 select(mapColumn(",
+				"          EMPLOYEE_ID,",
+				"          DEPARTMENT_ID,",
+				"          SALARY,",
+				"          LEAD_SALARY = NEXT_SALARY,",
+				"          LAG_SALARY = LAST_SALARY,",
+				"          LAG_PREV_2SAL = LAG_UNBOUNDED,",
+				"          DENSE_RANK,",
+				"          ROW_NUMBER,",
+				"          DENSE_RANK",
+				"     ),",
+				"     partitionBy('hash', 1),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_id as string,",
+				"          name as string",
+				"     ),",
+				"     partitionFileNames:['TGT_LEADLAG_SAL.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

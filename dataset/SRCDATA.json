@@ -1,0 +1,51 @@
+{
+	"name": "SRCDATA",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"srcparamdata": {
+				"type": "string"
+			},
+			"srcparampath": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "SRCDATAPARAM"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().srcparamdata",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().srcparampath",
+					"type": "Expression"
+				},
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "emp_id",
+				"type": "String"
+			},
+			{
+				"name": "name",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

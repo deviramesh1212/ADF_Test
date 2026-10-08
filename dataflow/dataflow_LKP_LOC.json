@@ -1,0 +1,112 @@
+{
+	"name": "dataflow_LKP_LOC",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_SRC",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "DelimitedText11",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_TGT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "cast2"
+				},
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          LOCATION_ID as short,",
+				"          STREET_ADDRESS as string,",
+				"          POSTAL_CODE as string,",
+				"          CITY as string,",
+				"          STATE_PROVINCE as string,",
+				"          COUNTRY_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source(output(",
+				"          DEPARTMENT_ID as string,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as string,",
+				"          LOCATION_ID as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"source1 cast(output(",
+				"          LOCATION_ID as integer,",
+				"          STREET_ADDRESS as string,",
+				"          POSTAL_CODE as string,",
+				"          CITY as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"source2 cast(output(",
+				"          DEPARTMENT_ID as integer,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as string,",
+				"          LOCATION_ID as integer",
+				"     ),",
+				"     errors: true) ~> cast2",
+				"cast1, cast2 lookup(cast1@LOCATION_ID == cast2@LOCATION_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     partitionBy('hash', 1),",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 select(mapColumn(",
+				"          LOCATION_ID = cast1@LOCATION_ID,",
+				"          STREET_ADDRESS,",
+				"          CITY,",
+				"          COUNTRY_ID,",
+				"          DEPARTMENT_ID,",
+				"          DEPARTMENT_NAME",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_id as string,",
+				"          name as string",
+				"     ),",
+				"     partitionFileNames:['LKP_DEPT_LOC.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

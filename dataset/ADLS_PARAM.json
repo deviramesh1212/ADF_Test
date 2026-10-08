@@ -1,0 +1,45 @@
+{
+	"name": "ADLS_PARAM",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"CONTAINER": {
+				"type": "string"
+			},
+			"DIRECTORY": {
+				"type": "string"
+			},
+			"FILENAME": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().FILENAME",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DIRECTORY",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().CONTAINER",
+					"type": "Expression"
+				}
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": null,
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

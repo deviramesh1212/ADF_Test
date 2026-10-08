@@ -1,0 +1,33 @@
+{
+	"name": "ONPREM_SQLSERVER_param",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SQL_SEEVER_ONPREM",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"SOURCE_SCHEMA": {
+				"type": "string"
+			},
+			"SOURCE_TABLE": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ADF_TRAINING"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SOURCE_SCHEMA",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().SOURCE_TABLE",
+				"type": "Expression"
+			}
+		}
+	}
+}

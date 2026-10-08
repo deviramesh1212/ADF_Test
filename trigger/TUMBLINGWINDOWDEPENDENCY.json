@@ -1,0 +1,31 @@
+{
+	"name": "TUMBLINGWINDOWDEPENDENCY",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipeline": {
+			"pipelineReference": {
+				"referenceName": "pip_wildcard_copy1",
+				"type": "PipelineReference"
+			}
+		},
+		"type": "TumblingWindowTrigger",
+		"typeProperties": {
+			"frequency": "Minute",
+			"interval": 5,
+			"startTime": "2024-10-05T01:55:00Z",
+			"endTime": "2024-10-05T02:59:00Z",
+			"delay": "00:00:00",
+			"maxConcurrency": 3,
+			"retryPolicy": {
+				"intervalInSeconds": 30
+			},
+			"dependsOn": [
+				{
+					"type": "SelfDependencyTumblingWindowTriggerReference",
+					"offset": "-0.00:05:00"
+				}
+			]
+		}
+	}
+}

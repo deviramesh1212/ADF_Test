@@ -1,0 +1,70 @@
+[
+ {
+    "AUTHOR_UID": 1,
+    "CUST_ID": "101",
+    "FIRST_NAME": "Ravi",
+    "MIDDLE_NAME": "Sai",
+    "LAST_NAME": "Shankar",
+	"CONTACT DETAILS": [{
+      "Address": {
+      "Permanent address": "IND",
+      "current Address": "SA"
+      },
+      "phoneNumbers": {
+      "type": "office",
+      "number": "8010012344"
+      }
+    }]
+ },
+ {
+    "AUTHOR_UID": 2,
+    "CUST_ID": "102",
+    "FIRST_NAME": "Kishore",
+    "MIDDLE_NAME": null,
+    "LAST_NAME": "Kumar",
+	"CONTACT DETAILS": [{
+      "Address": {
+      "Permanent address": "AUS",
+      "current Address": "IND"
+      },
+      "phoneNumbers": {
+      "type": "office",
+      "number": "63100314321"
+      }
+    }]
+ },
+ {
+    "AUTHOR_UID": 3,
+    "CUST_ID": "103",
+    "FIRST_NAME": "Gulshan",
+    "MIDDLE_NAME": "S",
+    "LAST_NAME": "Grover",
+	"CONTACT DETAILS": [{
+      "Address": {
+      "Permanent address": "IND",
+      "current Address": "USA"
+      },
+      "phoneNumbers": {
+      "type": "office",
+      "number": "51234576665"
+      }
+    }]
+ },
+ {
+    "AUTHOR_UID": 4,
+    "CUST_ID": "104",
+    "FIRST_NAME": "Lakshmi",
+    "MIDDLE_NAME": null,
+    "LAST_NAME": "Srinivas",
+	"CONTACT DETAILS": [{
+      "Address": {
+      "Permanent address": "IND",
+      "current Address": "UK"
+      },
+      "phoneNumbers": {
+      "type": "office",
+      "number": "42123489883"
+      }
+    }]
+ }
+]

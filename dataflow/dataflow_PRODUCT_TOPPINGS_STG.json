@@ -1,0 +1,63 @@
+{
+	"name": "dataflow_PRODUCT_TOPPINGS_STG",
+	"properties": {
+		"folder": {
+			"name": "PROJECT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "product_topping",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "azure_prod_topp",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PRODUCT_TOPPING_ID as integer,",
+				"          TOPPING_NAME as string,",
+				"          TOPING_PRICE as string,",
+				"          IS_ACTIVE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(TOPING_PRICE = toDecimal(replace(TOPING_PRICE, '$', ''))) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          PRODUCT_TOPPING_ID,",
+				"          TOPPING_NAME,",
+				"          TOPING_PRICE,",
+				"          IS_ACTIVE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

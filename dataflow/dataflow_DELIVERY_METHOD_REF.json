@@ -1,0 +1,70 @@
+{
+	"name": "dataflow_DELIVERY_METHOD_REF",
+	"properties": {
+		"folder": {
+			"name": "PROJECT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DELIVERY_METHOD",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSql_DELIVERY_REF_SCD1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          DELIVERY_ID as string,",
+				"          DELIVERY_TYPE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(STG_CREATE_DATE = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 alterRow(upsertIf(1==1)) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Delivery_Type_Ref_key as integer,",
+				"          Delivery_Type_ID as integer,",
+				"          Delivery_Type as string,",
+				"          STG_CREATE_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['Delivery_Type_ID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Delivery_Type_ID = DELIVERY_ID,",
+				"          Delivery_Type = DELIVERY_TYPE,",
+				"          STG_CREATE_DATE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

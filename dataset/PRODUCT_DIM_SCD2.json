@@ -1,0 +1,17 @@
+{
+	"name": "PRODUCT_DIM_SCD2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "product_dim_new"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

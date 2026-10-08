@@ -1,0 +1,157 @@
+{
+	"name": "STG_PRODUCT_JOINS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "target/AzureProject/Stg_JOINS_TABLES",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "CUSTOMER_ID",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_FIRST_NAME",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_LAST_NAME",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_DOB",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "IS_LOYAL",
+				"type": "String"
+			},
+			{
+				"name": "FIRST_PURCHASE_DATE",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_ADDRESS_ID",
+				"type": "String"
+			},
+			{
+				"name": "ADDRESS_LANE1",
+				"type": "String"
+			},
+			{
+				"name": "ADDRESS_LANE_2",
+				"type": "String"
+			},
+			{
+				"name": "CITY_NAME",
+				"type": "String"
+			},
+			{
+				"name": "STATE_NAME",
+				"type": "String"
+			},
+			{
+				"name": "COUNTRY_NAME",
+				"type": "String"
+			},
+			{
+				"name": "ZIP_CODE",
+				"type": "String"
+			},
+			{
+				"name": "GATE_CODE",
+				"type": "String"
+			},
+			{
+				"name": "ADDRESS_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "ADDRESS_STATUS",
+				"type": "String"
+			},
+			{
+				"name": "SECONDARY_ADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "THIRD_ADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_PHONE_NUMBER_ID",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_PHONE_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_PHONE_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_PHONE_STATUS",
+				"type": "String"
+			},
+			{
+				"name": "SECONDARY_PHONE_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_EMAIL_ID",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_EMAIL",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_EMAIL_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "CUSTOMER_EMAIL_STATUS",
+				"type": "String"
+			},
+			{
+				"name": "SECONDARY_EMAIL",
+				"type": "String"
+			},
+			{
+				"name": "HUT_LOVERS_ID",
+				"type": "String"
+			},
+			{
+				"name": "JOINING_DATE",
+				"type": "String"
+			},
+			{
+				"name": "IS_ACTIVE",
+				"type": "String"
+			},
+			{
+				"name": "MEMBER_ID",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

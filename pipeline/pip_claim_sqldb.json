@@ -1,0 +1,170 @@
+{
+	"name": "pip_claim_sqldb",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "Claim_Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Claim_Number",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Incident_Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Incident_Number",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Claimant_Name",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Claimant_Name",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Climant_Address",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Climant_Address",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Payment_Type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Payment_Type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Claim_Amount",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Claim_Amount",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "Insurance_type",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Insurance_type",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Insurance_Number",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "Insurance_Number",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER": "adftraining",
+							"DIRECTORY": "STAGE",
+							"FILENAME": "claim.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference",
+						"parameters": {
+							"TARGET_SCHEMA": "dbo",
+							"TARGET_TABLE": "claim_tgt"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ADF_TRAINING_NEW"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "azure_prod_topp",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "hr",
+			"table": "PRODUCT_TOPPINGS_STG"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

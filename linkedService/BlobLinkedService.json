@@ -1,0 +1,19 @@
+{
+	"name": "BlobLinkedService",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://suganthistoragenew.dfs.core.windows.net/",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "LS_KEYVAULT_DEV",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "BLOBSTORAGESECRET"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

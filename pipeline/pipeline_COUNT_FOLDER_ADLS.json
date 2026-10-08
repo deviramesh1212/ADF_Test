@@ -1,0 +1,105 @@
+{
+	"name": "pipeline_COUNT_FOLDER_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Metadata1",
+				"description": "3) Get Count of File in an ADLS folder.",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER": "adftraining",
+							"DIRECTORY": "INPUT",
+							"FILENAME": {
+								"value": " ",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "file_count",
+					"value": {
+						"value": "@length(activity('Get Metadata1').output.childItems)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "new_count",
+					"value": {
+						"value": "@variables('file_count')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"file_count": {
+				"type": "Integer"
+			},
+			"new_count": {
+				"type": "Integer"
+			}
+		},
+		"folder": {
+			"name": "ADF_TRAINING_NEW/ASSIGNMENTS"
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,79 @@
+{
+	"name": "dataflow_JSONFILE_LOAD",
+	"properties": {
+		"folder": {
+			"name": "LEARN"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "JsonFILE_LOAD",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "JSON_FLATTEN",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AUTHOR_UID as short,",
+				"          {CONTACT DETAILS} as ({Permanent address} as string, {current Address} as string)[],",
+				"          CUST_ID as short,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          MIDDLE_NAME as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments',",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source1 foldDown(unroll(CONTACT DETAILS, CONTACT DETAILS),",
+				"     mapColumn(",
+				"          AUTHOR_UID,",
+				"          PERMADDRESS = {CONTACT DETAILS}.{Permanent address},",
+				"          CURRENT_ADDRESS = {CONTACT DETAILS}.{current Address},",
+				"          CUST_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          MIDDLE_NAME",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['FLATTEN_JSON.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          AUTHOR_UID,",
+				"          PERMADDRESS,",
+				"          CURRENT_ADDRESS,",
+				"          CUST_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          MIDDLE_NAME",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

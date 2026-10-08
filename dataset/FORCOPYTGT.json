@@ -1,0 +1,58 @@
+{
+	"name": "FORCOPYTGT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TGT_FILE": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().TGT_FILE",
+					"type": "Expression"
+				},
+				"folderPath": "target/ForEach",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "LOCATION_ID",
+				"type": "String"
+			},
+			{
+				"name": "STREET_ADDRESS",
+				"type": "String"
+			},
+			{
+				"name": "POSTAL_CODE",
+				"type": "String"
+			},
+			{
+				"name": "CITY",
+				"type": "String"
+			},
+			{
+				"name": "STATE_PROVINCE",
+				"type": "String"
+			},
+			{
+				"name": "COUNTRY_ID",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

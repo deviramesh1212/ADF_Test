@@ -1,0 +1,20 @@
+{
+	"name": "DEL_PRAC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-c23e744f-ebf4-4ebf-bbb4-88787ada5a47-c000.csv",
+				"folderPath": "source",
+				"fileSystem": "data"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

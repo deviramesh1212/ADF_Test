@@ -1,0 +1,78 @@
+{
+	"name": "dataflow_FIXEDWIDTH_FILE",
+	"properties": {
+		"folder": {
+			"name": "LEARN"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "FIXEDWIDTH",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "fixedwidth_data",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source1 derive(EMP_ID = substring({EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER}, 1, 7),",
+				"          FIRST_NAME = substring({EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER}, 8,16),",
+				"          LAST_NAME = substring({EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER}, 19, 27),",
+				"          EMAIL = substring({EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER}, 31,39),",
+				"          PHONE_NUMBER = substring({EMP_ID FIRST_NAME  LAST_NAME   EMAIL     PHONE_NUMBER}, 41,55)) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          EMP_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          EMAIL,",
+				"          PHONE_NUMBER",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          EMP_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          EMAIL,",
+				"          PHONE_NUMBER",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"name": "AzureSqlTable_LOCATIONS_DIMSCD",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "LOCATION_DIM1"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,35 @@
+{
+	"name": "ONPREM_SQLSERVER",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "CUSTOMER_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "NAME",
+				"type": "varchar"
+			},
+			{
+				"name": "age",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "city",
+				"type": "varchar"
+			},
+			{
+				"name": "preexisting_Disease",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "MDF",
+			"table": "CONTROL_TABLE"
+		}
+	}
+}

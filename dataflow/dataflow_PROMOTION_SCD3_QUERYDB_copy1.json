@@ -1,0 +1,159 @@
+{
+	"name": "dataflow_PROMOTION_SCD3_QUERYDB_copy1",
+	"properties": {
+		"folder": {
+			"name": "ASSIGNMENT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_PROMO_QUERY",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_PROMO_DIM_JOIN",
+						"type": "DatasetReference"
+					},
+					"name": "INSERTSINK"
+				},
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_PROMO_DIM_JOIN",
+						"type": "DatasetReference"
+					},
+					"name": "UPDATESINK"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "cast1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          SRC_PROMOTION_ID as integer,",
+				"          SRC_PROMOTION_NAME as string,",
+				"          SRC_PROMOTION_TYPE as string,",
+				"          SRC_DISCOUNT_AMOUNT as string,",
+				"          SRC_START_DATE as date,",
+				"          SRC_END_DATE as date,",
+				"          TGT_PROMOTION_ID as integer,",
+				"          TGT_PROMOTION_NAME as string,",
+				"          TGT_PROMOTION_TYPE as string,",
+				"          TGT_DISCOUNT_AMOUNT as decimal(5,2),",
+				"          TGT_START_DATE as date,",
+				"          TGT_END_DATE as date,",
+				"          FLAG_UPDATE as string,",
+				"          FLAG_INSERT as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'SELECT PS.[PROMOTION_ID] AS SRC_PROMOTION_ID,PS.[PROMOTION_NAME] AS  SRC_PROMOTION_NAME, PS.[PROMOTION_TYPE] AS SRC_PROMOTION_TYPE,PS.[DISCOUNT_AMOUNT] AS SRC_DISCOUNT_AMOUNT,\\nPS.[START_DATE] AS SRC_START_DATE,PS.[END_DATE] AS SRC_END_DATE,PD.[PROMOTION_ID] AS TGT_PROMOTION_ID,PD.[PROMOTION_NAME] AS TGT_PROMOTION_NAME,PD.[PROMOTION_TYPE] AS TGT_PROMOTION_TYPE,\\nPD.[DISCOUNT_AMOUNT] AS TGT_DISCOUNT_AMOUNT,PD.[START_DATE] AS TGT_START_DATE,PD.[END_DATE] AS TGT_END_DATE,\\nCASE WHEN PD.PROMOTION_ID IS NOT NULL AND PS.[DISCOUNT_AMOUNT] <> PD.[DISCOUNT_AMOUNT] THEN \\'UPDATE\\' ELSE \\'NOVALUE\\' END AS FLAG_UPDATE,\\nCASE WHEN PD.PROMOTION_ID IS NULL THEN \\'INSERT\\' ELSE \\'NOVALUE\\' END AS FLAG_INSERT\\nFROM [hr].[PROMOTION_STG] AS PS\\nLEFT JOIN [hr].[PROMOTION_DIM] AS PD\\nON PS.[PROMOTION_ID] = PD.[PROMOTION_ID]',",
+				"     format: 'query') ~> source1",
+				"select1 filter(FLAG_INSERT == 'INSERT') ~> filter1",
+				"select1 filter(FLAG_UPDATE == 'UPDATE') ~> filter2",
+				"cast1 select(mapColumn(",
+				"          SRC_PROMOTION_ID,",
+				"          SRC_PROMOTION_NAME,",
+				"          SRC_PROMOTION_TYPE,",
+				"          SRC_DISCOUNT_AMOUNT,",
+				"          SRC_START_DATE,",
+				"          SRC_END_DATE,",
+				"          TGT_PROMOTION_ID,",
+				"          TGT_PROMOTION_NAME,",
+				"          TGT_PROMOTION_TYPE,",
+				"          TGT_DISCOUNT_AMOUNT,",
+				"          TGT_START_DATE,",
+				"          TGT_END_DATE,",
+				"          FLAG_UPDATE,",
+				"          FLAG_INSERT",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"filter2 alterRow(updateIf(1==1)) ~> alterRow1",
+				"source1 cast(output(",
+				"          SRC_PROMOTION_ID as integer,",
+				"          SRC_PROMOTION_NAME as string,",
+				"          SRC_PROMOTION_TYPE as string,",
+				"          SRC_DISCOUNT_AMOUNT as string,",
+				"          SRC_START_DATE as date,",
+				"          SRC_END_DATE as date,",
+				"          TGT_PROMOTION_ID as integer,",
+				"          TGT_PROMOTION_NAME as string,",
+				"          TGT_PROMOTION_TYPE as string,",
+				"          TGT_DISCOUNT_AMOUNT as decimal(5,2),",
+				"          TGT_START_DATE as date,",
+				"          TGT_END_DATE as date,",
+				"          FLAG_UPDATE as string,",
+				"          FLAG_INSERT as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          SRC_PROMOTION_ID,",
+				"          SRC_PROMOTION_NAME,",
+				"          SRC_PROMOTION_TYPE,",
+				"          SRC_DISCOUNT_AMOUNT,",
+				"          SRC_START_DATE,",
+				"          SRC_END_DATE",
+				"     )) ~> INSERTSINK",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['TGT_PROMOTION_ID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          SRC_PROMOTION_ID,",
+				"          SRC_PROMOTION_NAME,",
+				"          SRC_PROMOTION_TYPE,",
+				"          SRC_DISCOUNT_AMOUNT,",
+				"          SRC_START_DATE,",
+				"          SRC_END_DATE,",
+				"          TGT_PROMOTION_ID,",
+				"          TGT_PROMOTION_NAME,",
+				"          TGT_PROMOTION_TYPE,",
+				"          TGT_DISCOUNT_AMOUNT,",
+				"          TGT_START_DATE,",
+				"          TGT_END_DATE,",
+				"          FLAG_UPDATE,",
+				"          FLAG_INSERT",
+				"     )) ~> UPDATESINK"
+			]
+		}
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"name": "FILEEXISTS_TGT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "tgt_file_exists.csv",
+				"folderPath": "target",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Channel_Ref_Key",
+				"type": "String"
+			},
+			{
+				"name": "Channel_ID",
+				"type": "String"
+			},
+			{
+				"name": "Channel_Type",
+				"type": "String"
+			}
+		]
+	}
+}

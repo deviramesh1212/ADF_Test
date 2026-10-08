@@ -1,0 +1,124 @@
+{
+	"name": "pipeline_READ_JSON",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['AUTHOR_UID']"
+								},
+								"sink": {
+									"name": "AUTHOR_UID"
+								}
+							},
+							{
+								"source": {
+									"path": "$['CUST_ID']"
+								},
+								"sink": {
+									"name": "CUST_ID"
+								}
+							},
+							{
+								"source": {
+									"path": "$['FIRST_NAME']"
+								},
+								"sink": {
+									"name": "FIRST_NAME"
+								}
+							},
+							{
+								"source": {
+									"path": "$['MIDDLE_NAME']"
+								},
+								"sink": {
+									"name": "MIDDLE_NAME"
+								}
+							},
+							{
+								"source": {
+									"path": "$['LAST_NAME']"
+								},
+								"sink": {
+									"name": "LAST_NAME"
+								}
+							},
+							{
+								"source": {
+									"path": "$['CONTACT DETAILS'][0]['Permanent address']"
+								},
+								"sink": {
+									"name": "Permanent address"
+								}
+							},
+							{
+								"source": {
+									"path": "$['$[\\'CONTACT DETAILS\\'][1][\\'current Address\\']']"
+								},
+								"sink": {
+									"name": "current Address"
+								}
+							}
+						],
+						"collectionReference": "$['CONTACT DETAILS']",
+						"mapComplexValuesToString": true
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Json_PARSE",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "PARSED_JSON_COPY",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "LEARN"
+		},
+		"annotations": []
+	}
+}

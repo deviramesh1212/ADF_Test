@@ -1,0 +1,66 @@
+{
+	"name": "dataflow_UNPIVOT_TRF",
+	"properties": {
+		"folder": {
+			"name": "ADF_TRAINING_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "unpivot1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Event_ID as integer,",
+				"          Location as string,",
+				"          max_total_usageCar as integer,",
+				"          max_total_usageChairs as integer,",
+				"          max_total_usageFan as integer,",
+				"          max_total_usageTable as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source1 unpivot(output(",
+				"          eventusage as string,",
+				"          max_total_usageCar as integer",
+				"     ),",
+				"     ungroupBy(Event_ID,",
+				"          Location),",
+				"     lateral: true,",
+				"     ignoreNullPivots: false) ~> unpivot1",
+				"unpivot1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+			]
+		}
+	}
+}

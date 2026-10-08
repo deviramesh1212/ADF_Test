@@ -1,0 +1,17 @@
+{
+	"name": "AZURE_CHANNEL_REF",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "hr",
+			"table": "CHANNEL_REF"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

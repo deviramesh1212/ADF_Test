@@ -1,0 +1,134 @@
+{
+	"name": "pip_employees",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "FILENAME",
+								"value": "$$FILENAME"
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "sourcedataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"SRCPARAMDATA": {
+								"value": "@variables('VARSRCEMP1')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "sinkdataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"PARAMDATASET": {
+								"value": "@variables('VARTGTEMP1')",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "VARSRCEMP1",
+					"value": {
+						"value": "@pipeline().parameters.PSOURCEEMP",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"PSOURCEEMP": {
+				"type": "string"
+			},
+			"PTARGETEMP": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"VARSOURCEEMPLOYEE": {
+				"type": "String",
+				"defaultValue": "HR_EMPLOYEES_NEW.csv"
+			},
+			"VARPTARGETEMPLOYEE": {
+				"type": "String",
+				"defaultValue": "EEEMP_"
+			},
+			"VARSRCEMP1": {
+				"type": "String"
+			},
+			"VARTGTEMP1": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-26T01:52:34Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

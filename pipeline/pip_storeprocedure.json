@@ -1,0 +1,105 @@
+{
+	"name": "pip_storeprocedure",
+	"properties": {
+		"activities": [
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[SP_EMPLOYEE]",
+					"storedProcedureParameters": {
+						"Id": {
+							"value": "",
+							"type": "String"
+						},
+						"Name": {
+							"value": "",
+							"type": "String"
+						},
+						"Gender": {
+							"value": "",
+							"type": "String"
+						},
+						"DeptId": {
+							"value": "",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "SQL_SEEVER_ONPREM",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "sp_value",
+					"value": {
+						"value": "@activity('Stored procedure1').output",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_stpre",
+					"value": {
+						"value": "@variables('sp_value')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"v_stpre": {
+				"type": "String"
+			},
+			"sp_value": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "ADF_TRAINING_NEW"
+		},
+		"annotations": []
+	}
+}

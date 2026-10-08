@@ -1,0 +1,70 @@
+{
+	"name": "dataflow_CHANNEL_REF_SCD1",
+	"properties": {
+		"folder": {
+			"name": "PROJECT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CHANNEL_REF",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AZURE_CHANNEL_REF_SCD1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          CHANNEL_ID as integer,",
+				"          CHANNEL_TYPE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(STG_CREATE_DATE = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 alterRow(upsertIf(1==1)) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Channel_ref_key as integer,",
+				"          Channel_ID as integer,",
+				"          Channel_Type as string,",
+				"          STG_CREATE_DATE as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['Channel_ID'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Channel_ID = CHANNEL_ID,",
+				"          Channel_Type = CHANNEL_TYPE,",
+				"          STG_CREATE_DATE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

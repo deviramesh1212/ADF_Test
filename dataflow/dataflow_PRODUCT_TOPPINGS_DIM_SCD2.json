@@ -1,0 +1,172 @@
+{
+	"name": "dataflow_PRODUCT_TOPPINGS_DIM_SCD2",
+	"properties": {
+		"folder": {
+			"name": "PROJECT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "azure_prod_topp",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Azure_PROD_TOPPINGS_DIM",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Azure_PROD_TOPPINGS_DIM",
+						"type": "DatasetReference"
+					},
+					"name": "INSERT"
+				},
+				{
+					"dataset": {
+						"referenceName": "Azure_PROD_TOPPINGS_DIM",
+						"type": "DatasetReference"
+					},
+					"name": "UPDATE"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "filter2"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "filter3"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PRODUCT_TOPPING_ID as integer,",
+				"          TOPPING_NAME as string,",
+				"          TOPING_PRICE as decimal(10,2),",
+				"          IS_ACTIVE as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source1",
+				"source(output(",
+				"          Product_Dim_Key as integer,",
+				"          Product_Topping_ID as integer,",
+				"          Topping_Name as string,",
+				"          Topping_Price as decimal(5,2),",
+				"          Is_Active as string,",
+				"          Flag as string,",
+				"          Effective_Date as date,",
+				"          End_Date as date,",
+				"          Stg_Create_Date as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> source2",
+				"derivedColumn3, derivedColumn1 lookup(source1@PRODUCT_TOPPING_ID == source2@Product_Topping_ID,",
+				"     multiple: true,",
+				"     broadcast: 'auto',",
+				"     pickup: 'any')~> lookup1",
+				"filter3 derive(TGT_MD5 = md5(Topping_Name,toString(Topping_Price),Is_Active)) ~> derivedColumn1",
+				"lookup1 derive(STG_CREATE_DATE = currentDate(),",
+				"          START_DATE = currentDate(),",
+				"          ACTIVE_FLAG = 'Y') ~> derivedColumn2",
+				"source1 derive(SRC_MD5 = md5(TOPPING_NAME,toString(TOPING_PRICE),IS_ACTIVE)) ~> derivedColumn3",
+				"lookup1 derive(End_Date = currentDate(),",
+				"          DEACTIVE_FLAG = 'N') ~> derivedColumn4",
+				"derivedColumn4 filter(!isNull(source2@Product_Topping_ID) && SRC_MD5 != TGT_MD5) ~> filter1",
+				"derivedColumn2 filter(isNull(source2@Product_Topping_ID) || SRC_MD5 != TGT_MD5) ~> filter2",
+				"filter1 alterRow(updateIf(1==1)) ~> alterRow1",
+				"source2 filter(isNull(End_Date) == true() && Flag == 'Y') ~> filter3",
+				"filter2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Product_Dim_Key as integer,",
+				"          Product_Topping_ID as integer,",
+				"          Topping_Name as string,",
+				"          Topping_Price as decimal(5,2),",
+				"          Is_Active as string,",
+				"          Flag as string,",
+				"          Effective_Date as date,",
+				"          End_Date as date,",
+				"          Stg_Create_Date as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Product_Topping_ID = source1@PRODUCT_TOPPING_ID,",
+				"          Topping_Name = source1@TOPPING_NAME,",
+				"          Topping_Price = TOPING_PRICE,",
+				"          Is_Active = source1@IS_ACTIVE,",
+				"          Flag = ACTIVE_FLAG,",
+				"          Effective_Date = START_DATE,",
+				"          End_Date,",
+				"          Stg_Create_Date = derivedColumn2@STG_CREATE_DATE",
+				"     )) ~> INSERT",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Product_Dim_Key as integer,",
+				"          Product_Topping_ID as integer,",
+				"          Topping_Name as string,",
+				"          Topping_Price as decimal(5,2),",
+				"          Is_Active as string,",
+				"          Flag as string,",
+				"          Effective_Date as date,",
+				"          End_Date as date,",
+				"          Stg_Create_Date as date",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['Product_Dim_Key'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Product_Dim_Key,",
+				"          End_Date,",
+				"          Flag = DEACTIVE_FLAG",
+				"     )) ~> UPDATE"
+			]
+		}
+	}
+}

@@ -1,0 +1,32 @@
+{
+	"name": "LKP_DB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Oracle1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"LKP_TABLE_NAME": {
+				"type": "string"
+			},
+			"LKP_SCHEMA_NAME": {
+				"type": "string",
+				"defaultValue": "HR"
+			}
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().LKP_SCHEMA_NAME",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().LKP_TABLE_NAME",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

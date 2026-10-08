@@ -1,0 +1,26 @@
+{
+	"name": "SNOWFLAKE_param",
+	"properties": {
+		"parameters": {
+			"schema": {
+				"type": "string"
+			},
+			"filename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SnowflakeV2Table",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().schema",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().filename",
+				"type": "Expression"
+			}
+		}
+	}
+}

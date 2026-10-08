@@ -1,0 +1,23 @@
+{
+	"name": "DELETEFILE",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DELETEFILE": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "INPUT",
+				"fileSystem": "data"
+			}
+		}
+	}
+}

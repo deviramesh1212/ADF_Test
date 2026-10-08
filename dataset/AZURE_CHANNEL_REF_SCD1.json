@@ -1,0 +1,36 @@
+{
+	"name": "AZURE_CHANNEL_REF_SCD1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Channel_ref_key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Channel_ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Channel_Type",
+				"type": "varchar"
+			},
+			{
+				"name": "STG_CREATE_DATE",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "hr",
+			"table": "CHANNEL_REF"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,142 @@
+{
+	"name": "pip_department",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "sourcedataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"SRCPARAMDATA": {
+								"value": "@variables('deptvariable1')",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "sinkdataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"PARAMDATASET": {
+								"value": "@concat(pipeline().parameters.tgtdeptparam,utcNow())",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set variable1_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "deptvariable1",
+					"value": {
+						"value": "@pipeline().parameters.sourcedeptparam",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable1_copy1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "deptvariable1",
+					"value": {
+						"value": "@pipeline().parameters.sourcedeptparam",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"tgtdeptparam": {
+				"type": "string"
+			},
+			"sourcedeptparam": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"deptvariable1": {
+				"type": "String",
+				"defaultValue": "dept_value"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-02T07:59:39Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,172 @@
+{
+	"name": "dataflow_CLAIM_SCD2",
+	"properties": {
+		"folder": {
+			"name": "ADF_TRAINING_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference"
+					},
+					"name": "claimcsv"
+				},
+				{
+					"dataset": {
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "claimtgt"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "insertsink"
+				},
+				{
+					"dataset": {
+						"referenceName": "ADF_TRAIN_SQLDB",
+						"type": "DatasetReference"
+					},
+					"name": "updatesink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "INSERT"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "SGENERATE"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "alterRow1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Claim_Number as string,",
+				"          Incident_Number as string,",
+				"          Claimant_Name as string,",
+				"          Climant_Address as string,",
+				"          Payment_Type as string,",
+				"          Claim_Amount as integer,",
+				"          Insurance_type as string,",
+				"          Insurance_Number as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> claimcsv",
+				"source(output(",
+				"          maxs_key as integer,",
+				"          s_key as integer,",
+				"          Claim_Number as string,",
+				"          Incident_Number as string,",
+				"          Claimant_Name as string,",
+				"          Climant_Address as string,",
+				"          Payment_Type as string,",
+				"          Claim_Amount as integer,",
+				"          Insurance_type as string,",
+				"          Insurance_Number as string,",
+				"          Flag as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select coalesce(max(s_key) over(),0) as maxs_key, e.* from [dbo].[CLAIM_tgt] e where flag = \\'Y\\'',",
+				"     format: 'query') ~> claimtgt",
+				"claimcsv, claimtgt lookup(claimcsv@Claim_Number == claimtgt@Claim_Number,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 derive(INS_UPD_VAR = iif(isNull(claimtgt@Claim_Number),'I', iif(! isNull(claimtgt@Claim_Number) && :src_md5 != :tgt_md5, 'U','')),",
+				"          SRC_MD5 = :src_md5,",
+				"          TGT_MD5 = :tgt_md5,",
+				"          src_md5 := md5(claimcsv@Incident_Number,claimcsv@Claimant_Name,claimcsv@Climant_Address,claimcsv@Payment_Type,claimcsv@Claim_Amount,claimcsv@Insurance_type,claimcsv@Insurance_Number),",
+				"          tgt_md5 := md5(claimtgt@Incident_Number,claimtgt@Claimant_Name,claimtgt@Climant_Address,claimtgt@Payment_Type,claimtgt@Claim_Amount,claimtgt@Insurance_type,claimtgt@Insurance_Number)) ~> derivedColumn1",
+				"derivedColumn1 split(INS_UPD_VAR == 'I' || INS_UPD_VAR == 'U',",
+				"     INS_UPD_VAR == 'U',",
+				"     disjoint: false) ~> INSERT@(INSERT, UPDATE)",
+				"INSERT@INSERT select(mapColumn(",
+				"          Claim_Number = INSERT@INSERT@Claim_Number,",
+				"          Incident_Number = INSERT@INSERT@Incident_Number,",
+				"          Claimant_Name = INSERT@INSERT@Claimant_Name,",
+				"          Climant_Address = INSERT@INSERT@Climant_Address,",
+				"          Payment_Type = INSERT@INSERT@Payment_Type,",
+				"          Claim_Amount = INSERT@INSERT@Claim_Amount,",
+				"          Insurance_type = INSERT@INSERT@Insurance_type,",
+				"          Insurance_Number = INSERT@INSERT@Insurance_Number,",
+				"          maxs_key",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"SGENERATE derive(Flag = 'Y',",
+				"          s_key = sk_generate_key + maxs_key) ~> derivedColumn2",
+				"select1 keyGenerate(output(sk_generate_key as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> SGENERATE",
+				"INSERT@UPDATE derive(Flag = 'N') ~> derivedColumn3",
+				"derivedColumn3 alterRow(updateIf(1 == 1)) ~> alterRow1",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Claim_Number,",
+				"          Incident_Number,",
+				"          Claimant_Name,",
+				"          Climant_Address,",
+				"          Payment_Type,",
+				"          Claim_Amount,",
+				"          Insurance_type,",
+				"          Insurance_Number,",
+				"          maxs_key = sk_generate_key,",
+				"          s_key,",
+				"          Flag",
+				"     )) ~> insertsink",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['s_key'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          s_key = maxs_key,",
+				"          Flag",
+				"     )) ~> updatesink"
+			]
+		}
+	}
+}

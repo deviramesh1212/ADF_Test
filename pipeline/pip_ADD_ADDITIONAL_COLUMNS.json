@@ -1,0 +1,90 @@
+{
+	"name": "pip_ADD_ADDITIONAL_COLUMNS",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"description": "5) Add additional columns during Copy activity.",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "UPDATED_DATE",
+								"value": "@utcNow()"
+							},
+							{
+								"name": "USER_NAME",
+								"value": "'SUGANTHI'"
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER": "adftraining",
+							"DIRECTORY": "INPUT",
+							"FILENAME": "country.csv"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER": "adftraining",
+							"DIRECTORY": "OUTPUT_ASSIGN",
+							"FILENAME": "country_new_column.csv"
+						}
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ADF_TRAINING_NEW/ASSIGNMENTS"
+		},
+		"annotations": []
+	}
+}

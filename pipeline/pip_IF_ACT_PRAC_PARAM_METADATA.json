@@ -1,0 +1,190 @@
+{
+	"name": "pip_IF_ACT_PRAC_PARAM_METADATA",
+	"properties": {
+		"activities": [
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(activity('Get Metadata1').output.size, 10)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "MESSAGE",
+								"value": "'CHECKED MESSAGE'"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobFSReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "BLOB_IF_PARAM",
+									"type": "DatasetReference",
+									"parameters": {
+										"FILE_NAME_SRC": {
+											"value": "@pipeline().parameters.FILE_NAME_SRC",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "TGTDATA",
+									"type": "DatasetReference",
+									"parameters": {
+										"TGTPARAM": {
+											"value": "@pipeline().parameters.TGTPARAM_FILE",
+											"type": "Expression"
+										},
+										"TGTPATH": {
+											"value": "@pipeline().parameters.TGTPARAM_FOLDER",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "BLOB_IF_PARAM_ACTIVITY",
+						"type": "DatasetReference",
+						"parameters": {
+							"FOLDER_NAME": {
+								"value": "@pipeline().parameters.FOLDER_NAME_TGT",
+								"type": "Expression"
+							},
+							"FILE_NAME": {
+								"value": "@pipeline().parameters.FILE_NAME_TGT",
+								"type": "Expression"
+							}
+						}
+					},
+					"fieldList": [
+						"size"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"RUNLOAD": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"FILE_NAME_SRC": {
+				"type": "string"
+			},
+			"FOLDER_NAME_TGT": {
+				"type": "string"
+			},
+			"FILE_NAME_TGT": {
+				"type": "string"
+			},
+			"TGTPARAM_FOLDER": {
+				"type": "string"
+			},
+			"TGTPARAM_FILE": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"MESSAGE": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "PARAMPATH"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-25T03:58:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

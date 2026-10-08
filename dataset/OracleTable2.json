@@ -1,0 +1,17 @@
+{
+	"name": "OracleTable2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Oracle1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "TGT_COUNTRIES"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

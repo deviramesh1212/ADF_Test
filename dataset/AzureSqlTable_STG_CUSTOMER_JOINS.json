@@ -1,0 +1,17 @@
+{
+	"name": "AzureSqlTable_STG_CUSTOMER_JOINS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "CUSTOMERS_DIM"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

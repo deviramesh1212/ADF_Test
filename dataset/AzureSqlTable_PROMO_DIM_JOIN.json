@@ -1,0 +1,17 @@
+{
+	"name": "AzureSqlTable_PROMO_DIM_JOIN",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "PROMOTION_DIM_QUERY"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

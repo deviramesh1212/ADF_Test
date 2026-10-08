@@ -1,0 +1,190 @@
+{
+	"name": "dataflow_PRODUCT_DIM_SCD2",
+	"properties": {
+		"folder": {
+			"name": "ADF_TRAINING_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference"
+					},
+					"name": "productjoin"
+				},
+				{
+					"dataset": {
+						"referenceName": "PRODUCT_DIM_SCD2",
+						"type": "DatasetReference"
+					},
+					"name": "productdim"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "PRODUCT_DIM_SCD2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "PRODUCT_DIM_SCD2",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "lookup1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "split1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "skeygenerate"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PRODUCT_ID as integer,",
+				"          PRODUCT_NAME as string,",
+				"          PRODUCT_PRICE as decimal(5,2),",
+				"          PRODUCT_DESCRIPTION as string,",
+				"          IS_ACTIVE as string,",
+				"          PRODUCT_SUBCATEGORY_ID as integer,",
+				"          PRODUCT_SUBCATEGORY_NAME as string,",
+				"          PRODUCT_SIZE as string,",
+				"          PRODUCT_CATEGORY_NAME as string,",
+				"          PRODUCT_CATEGORY_ID as string,",
+				"          CREATE_USER_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> productjoin",
+				"source(output(",
+				"          Surr_Product_kEY as integer,",
+				"          Product_ID as integer,",
+				"          Product_Name as string,",
+				"          Product_Price as decimal(5,2),",
+				"          Is_Active as string,",
+				"          PRODUCT_CATEGORY_ID as string,",
+				"          Product_Category_Name as string,",
+				"          Product_SubCategory_ID as integer,",
+				"          Product_SubCategory_Name as string,",
+				"          Product_Size as string,",
+				"          Product_Description as string,",
+				"          Eff_Start_Date as date,",
+				"          Eff_End_Date as date,",
+				"          DIM_CREATE_DATE as date,",
+				"          FLAG as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     query: 'select * from [dbo].[product_dim_new] e where flag =1',",
+				"     format: 'query') ~> productdim",
+				"productjoin, productdim lookup(productjoin@PRODUCT_ID == productdim@Product_ID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
+				"lookup1 derive(src_tgt_MD5 = iif(isNull(Surr_Product_kEY), 'I',iif(!isNull(Surr_Product_kEY) && :src_md5 != :tgt_md5,'U', '')),",
+				"          SRC_md5 = :src_md5,",
+				"          TGT_md5 = :tgt_md5,",
+				"          src_md5 := md5(productjoin@PRODUCT_NAME,productjoin@PRODUCT_PRICE,productjoin@PRODUCT_DESCRIPTION,productjoin@IS_ACTIVE,productjoin@PRODUCT_SUBCATEGORY_ID,productjoin@PRODUCT_SUBCATEGORY_NAME,productjoin@PRODUCT_SIZE,productjoin@PRODUCT_CATEGORY_NAME,productjoin@PRODUCT_CATEGORY_ID),",
+				"          tgt_md5 := md5(productdim@Product_Name,productdim@Product_Price,productdim@Product_Description,productdim@Is_Active,productdim@Product_SubCategory_ID,productdim@Product_SubCategory_Name,productdim@Product_Size,productdim@Product_Category_Name,productdim@PRODUCT_CATEGORY_ID)) ~> derivedColumn1",
+				"derivedColumn1 split(src_tgt_MD5 == 'I' || src_tgt_MD5 == 'U',",
+				"     src_tgt_MD5 == 'U',",
+				"     disjoint: false) ~> split1@(INSERT, UPDATE)",
+				"skeygenerate derive(EFF_START_DATE = currentDate(),",
+				"          FLAG = 1,",
+				"          DIM_CREATE_DATE = currentDate(),",
+				"          S_KEY = S_KEY_GENERATE) ~> derivedColumn2",
+				"split1@UPDATE derive(FLAG = 0,",
+				"          EFF_END_DATE = addDays(currentDate(), -1)) ~> derivedColumn3",
+				"derivedColumn3 alterRow(updateIf(1==1)) ~> alterRow1",
+				"select1 keyGenerate(output(S_KEY_GENERATE as long),",
+				"     startAt: 1L,",
+				"     stepValue: 1L) ~> skeygenerate",
+				"split1@INSERT select(mapColumn(",
+				"          PRODUCT_ID = split1@INSERT@PRODUCT_ID,",
+				"          PRODUCT_NAME = split1@INSERT@PRODUCT_NAME,",
+				"          PRODUCT_PRICE = split1@INSERT@PRODUCT_PRICE,",
+				"          PRODUCT_DESCRIPTION = split1@INSERT@PRODUCT_DESCRIPTION,",
+				"          IS_ACTIVE = split1@INSERT@IS_ACTIVE,",
+				"          PRODUCT_SUBCATEGORY_ID = split1@INSERT@PRODUCT_SUBCATEGORY_ID,",
+				"          PRODUCT_SUBCATEGORY_NAME = split1@INSERT@PRODUCT_SUBCATEGORY_NAME,",
+				"          PRODUCT_SIZE = split1@INSERT@PRODUCT_SIZE,",
+				"          PRODUCT_CATEGORY_NAME = split1@INSERT@PRODUCT_CATEGORY_NAME,",
+				"          PRODUCT_CATEGORY_ID = split1@INSERT@PRODUCT_CATEGORY_ID,",
+				"          CREATE_USER_DATE,",
+				"          src_tgt_MD5,",
+				"          SRC_md5,",
+				"          TGT_md5",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"derivedColumn2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          { Product_ID} = PRODUCT_ID,",
+				"          Product_Name = PRODUCT_NAME,",
+				"          Product_Price = PRODUCT_PRICE,",
+				"          Product_Description = PRODUCT_DESCRIPTION,",
+				"          Is_Active = IS_ACTIVE,",
+				"          Product_Subcategory_ID = PRODUCT_SUBCATEGORY_ID,",
+				"          Product_SubCategory_Name = PRODUCT_SUBCATEGORY_NAME,",
+				"          Product_Size = PRODUCT_SIZE,",
+				"          Product_Category_Name = PRODUCT_CATEGORY_NAME,",
+				"          PRODUCT_CATEGORY_ID,",
+				"          CREATE_USER_DATE,",
+				"          Surr_Product_kEY = S_KEY_GENERATE,",
+				"          EFF_START_DATE",
+				"     )) ~> sink1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:true,",
+				"     upsertable:false,",
+				"     keys:['Surr_Product_kEY'],",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          EFF_END_DATE = derivedColumn3@EFF_END_DATE,",
+				"          FLAG,",
+				"          Surr_Product_kEY",
+				"     )) ~> sink2"
+			]
+		}
+	}
+}

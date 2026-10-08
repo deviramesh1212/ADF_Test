@@ -1,0 +1,30 @@
+{
+	"name": "ADF_TRAIN_SQLDB",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"TARGET_SCHEMA": {
+				"type": "string"
+			},
+			"TARGET_TABLE": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().TARGET_SCHEMA",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TARGET_TABLE",
+				"type": "Expression"
+			}
+		}
+	}
+}

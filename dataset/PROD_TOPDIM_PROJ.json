@@ -1,0 +1,62 @@
+{
+	"name": "PROD_TOPDIM_PROJ",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "product_topping_dim.csv",
+				"folderPath": "target/AzureProject/DIMTABLE",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Product_Dim_Key",
+				"type": "String"
+			},
+			{
+				"name": "Product_Topping_ID",
+				"type": "String"
+			},
+			{
+				"name": "Topping_Name",
+				"type": "String"
+			},
+			{
+				"name": "Topping_Price",
+				"type": "String"
+			},
+			{
+				"name": "Is_Active",
+				"type": "String"
+			},
+			{
+				"name": "Flag",
+				"type": "String"
+			},
+			{
+				"name": "Effective_Date",
+				"type": "String"
+			},
+			{
+				"name": "End_Date",
+				"type": "String"
+			},
+			{
+				"name": "Stg_Create_Date",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

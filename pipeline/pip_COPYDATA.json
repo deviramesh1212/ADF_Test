@@ -1,0 +1,99 @@
+{
+	"name": "pip_COPYDATA",
+	"properties": {
+		"activities": [
+			{
+				"name": "data load table",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "OracleSink",
+						"writeBatchSize": 10000,
+						"preCopyScript": "TRUNCATE TABLE HR.CLAIM_TGT"
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "CLAIM_ID",
+									"type": "Decimal"
+								},
+								"sink": {
+									"name": "CLAIM_ID",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "CLAIMANT_NAME",
+									"type": "String"
+								},
+								"sink": {
+									"name": "CLAIMANT_NAME",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CLAIM_AMOUNT",
+									"type": "Decimal"
+								},
+								"sink": {
+									"name": "CLAIM_AMOUNT",
+									"type": "Decimal"
+								}
+							},
+							{
+								"source": {
+									"name": "UPDATE_DATE",
+									"type": "DateTime"
+								},
+								"sink": {
+									"name": "UPDATE_DATE",
+									"type": "DateTime"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ORACLE_OBJECT",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "oracle_claim",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "ADF_TRAINING_NEW"
+		},
+		"annotations": []
+	}
+}

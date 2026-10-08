@@ -1,0 +1,93 @@
+{
+	"name": "dataflow_DUPLICATE_AGRREGATE_GRP",
+	"properties": {
+		"folder": {
+			"name": "ADF_TRAINING_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ADLS_PARAM",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          EMPLOYEE_ID as short,",
+				"          FIRST_NAME as string,",
+				"          LAST_NAME as string,",
+				"          EMAIL as string,",
+				"          PHONE_NUMBER as string,",
+				"          HIRE_DATE as string,",
+				"          JOB_ID as string,",
+				"          SALARY as double,",
+				"          COMMISSION_PCT as double,",
+				"          MANAGER_ID as short,",
+				"          DEPARTMENT_ID as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 aggregate(groupBy(EMPLOYEE_ID),",
+				"     FIRST_NAME = first(FIRST_NAME),",
+				"          LAST_NAME = first(LAST_NAME),",
+				"          EMAIL = first(EMAIL),",
+				"          PHONE_NUMBER = first(PHONE_NUMBER),",
+				"          HIRE_DATE = first(HIRE_DATE),",
+				"          JOB_ID = first(JOB_ID),",
+				"          SALARY = first(SALARY),",
+				"          COMMISSION_PCT = first(COMMISSION_PCT),",
+				"          MANAGER_ID = first(MANAGER_ID),",
+				"          DEPARTMENT_ID = first(DEPARTMENT_ID)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AUTHOR_UID as integer,",
+				"          CUST_ID as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          {CONTACT DETAILS} as ({Permanent address} as string)[]",
+				"     ),",
+				"     partitionFileNames:['DUPLICATE_AGG_GRP.json'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          EMPLOYEE_ID,",
+				"          FIRST_NAME,",
+				"          LAST_NAME,",
+				"          EMAIL,",
+				"          PHONE_NUMBER,",
+				"          HIRE_DATE,",
+				"          JOB_ID,",
+				"          SALARY,",
+				"          COMMISSION_PCT,",
+				"          MANAGER_ID,",
+				"          DEPARTMENT_ID",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

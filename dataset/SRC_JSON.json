@@ -1,0 +1,50 @@
+{
+	"name": "SRC_JSON",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "cust_sample_address.json",
+				"folderPath": "INPUT",
+				"fileSystem": "data"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"AUTHOR_UID": {
+					"type": "integer"
+				},
+				"CUST_ID": {
+					"type": "string"
+				},
+				"FIRST_NAME": {
+					"type": "string"
+				},
+				"MIDDLE_NAME": {
+					"type": "string"
+				},
+				"LAST_NAME": {
+					"type": "string"
+				},
+				"CONTACT DETAILS": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"Permanent address": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

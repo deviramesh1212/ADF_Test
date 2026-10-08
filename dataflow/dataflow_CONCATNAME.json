@@ -1,0 +1,74 @@
+{
+	"name": "dataflow_CONCATNAME",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_CONCAT",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_EMP_TGT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "window1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "aggregate1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          col1 as string,",
+				"          col2 as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> source1",
+				"source1 cast(output(",
+				"          col1 as string,",
+				"          col2 as string",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 window(asc(col1, true),",
+				"     asc(col2, true),",
+				"     PREV_COL1 = lag(col1)) ~> window1",
+				"window1 derive(LAG_COL = iif(col1==PREV_COL1,concat(concat(col1,','),col2),col2)) ~> derivedColumn1",
+				"derivedColumn1 aggregate(groupBy(col1),",
+				"     count = count(col1),",
+				"     partitionBy('hash', 1)) ~> aggregate1",
+				"aggregate1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          emp_id as string,",
+				"          name as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

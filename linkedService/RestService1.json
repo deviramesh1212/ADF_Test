@@ -1,0 +1,12 @@
+{
+	"name": "RestService1",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://raw.githubusercontent.com/bigdatabysumitm/Trendytech-Azure-Project/refs/heads/main/datasets/claims/hospital1_claim_data.csv",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}

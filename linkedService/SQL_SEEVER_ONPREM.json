@@ -1,0 +1,21 @@
+{
+	"name": "SQL_SEEVER_ONPREM",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "BALAFAMILY\\SQLSERVER2017",
+			"database": "SQL_TRAINING_2024",
+			"encrypt": "mandatory",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "sa",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI0OTcxMjZjOS01YTQ0LTQwMDctODY4Mi1jMGRjYjdhOTRmMmEiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "SELFHOSTEDIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

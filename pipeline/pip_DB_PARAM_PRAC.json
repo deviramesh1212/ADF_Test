@@ -1,0 +1,92 @@
+{
+	"name": "pip_DB_PARAM_PRAC",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"partitionOption": "None",
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "DB_PARAM_PRAC",
+						"type": "DatasetReference",
+						"parameters": {
+							"TABLE_NAME": {
+								"value": "@pipeline().parameters.SOURCE_DB",
+								"type": "Expression"
+							},
+							"SCHEMA": {
+								"value": "@pipeline().parameters.SRC_SCHEMA",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "BLOB_DB_EMP_PRAC",
+						"type": "DatasetReference",
+						"parameters": {
+							"TGT_PARAM_EMP": {
+								"value": "@pipeline().parameters.TARGET_DB",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"SOURCE_DB": {
+				"type": "string"
+			},
+			"TARGET_DB": {
+				"type": "string"
+			},
+			"SRC_SCHEMA": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ORACLE_HR"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-23T03:21:35Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,17 @@
+{
+	"name": "AzureSqlTable_PROMOTION_STG",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "PROMOTION_STG"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

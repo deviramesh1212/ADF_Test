@@ -1,0 +1,165 @@
+{
+	"name": "pipeline_CDC_INCRLOAD_2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Ext_Last_Upd_Date",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT MAX(last_mod_date) FROM cdc_prac\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "SRC_CDC_PPAC",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Ext_Last_Load_Date",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT lastloadDate AS lastloadDate FROM dbo.control_table",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "CDC_CONTROL_TABLE",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "INCREMENTAL_EXTRACT",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Ext_Last_Upd_Date",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Ext_Last_Load_Date",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "select * from dbo.cdc_prac\nwhere last_mod_date >= '@{activity('Ext_Last_Upd_Date').output.firstRow.last_mod_date}' and last_mod_date > '@{activity('Ext_Last_Load_Date').output.firstRow.lastloadDate}'",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SRC_CDC_PPAC",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "TGT_CDC_PRAC",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Update_table_Control",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "INCREMENTAL_EXTRACT",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_update_loadinfo]",
+					"storedProcedureParameters": {
+						"modifieddate": {
+							"value": {
+								"value": "@{activity('Ext_Last_Upd_Date').output.firstRow.last_mod_date}",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TableName": {
+							"value": "dbo.cdc_prac",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"folder": {
+			"name": "LEARN"
+		},
+		"annotations": []
+	}
+}

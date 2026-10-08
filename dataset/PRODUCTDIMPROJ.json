@@ -1,0 +1,86 @@
+{
+	"name": "PRODUCTDIMPROJ",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "product_dim.csv",
+				"folderPath": "target/AzureProject/DIMTABLE",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Surr_Product_kEY",
+				"type": "String"
+			},
+			{
+				"name": "Product_ID",
+				"type": "String"
+			},
+			{
+				"name": "Product_Name",
+				"type": "String"
+			},
+			{
+				"name": "Product_Price",
+				"type": "String"
+			},
+			{
+				"name": "Is_Active",
+				"type": "String"
+			},
+			{
+				"name": "PRODUCT_CATEGORY_ID",
+				"type": "String"
+			},
+			{
+				"name": "Product_Category_Name",
+				"type": "String"
+			},
+			{
+				"name": "Product_SubCategory_ID",
+				"type": "String"
+			},
+			{
+				"name": "Product_SubCategory_Name",
+				"type": "String"
+			},
+			{
+				"name": "Product_Size",
+				"type": "String"
+			},
+			{
+				"name": "Product_Description",
+				"type": "String"
+			},
+			{
+				"name": "Eff_Start_Date",
+				"type": "String"
+			},
+			{
+				"name": "Eff_End_Date",
+				"type": "String"
+			},
+			{
+				"name": "DIM_CREATE_DATE",
+				"type": "String"
+			},
+			{
+				"name": "FLAG",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

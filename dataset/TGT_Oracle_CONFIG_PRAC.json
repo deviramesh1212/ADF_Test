@@ -1,0 +1,17 @@
+{
+	"name": "TGT_Oracle_CONFIG_PRAC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Oracle1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "DATALOAD"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

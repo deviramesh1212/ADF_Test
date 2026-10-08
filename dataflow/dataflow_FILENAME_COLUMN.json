@@ -1,0 +1,71 @@
+{
+	"name": "dataflow_FILENAME_COLUMN",
+	"properties": {
+		"folder": {
+			"name": "ASSIGNMENT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_DEPT_SRC",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Delimited_TGTDEPT",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          DEPARTMENT_ID as short,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as short,",
+				"          LOCATION_ID as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 cast(output(",
+				"          DEPARTMENT_ID as integer,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as integer,",
+				"          LOCATION_ID as integer",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 derive(FILE_NAME = 'DEPARTMENTS.csv') ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DEPARTMENT_ID as string,",
+				"          DEPARTMENT_NAME as string,",
+				"          MANAGER_ID as string,",
+				"          LOCATION_ID as string",
+				"     ),",
+				"     partitionFileNames:['TGT_DEPT_FILENAME.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}

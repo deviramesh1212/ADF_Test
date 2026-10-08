@@ -1,0 +1,71 @@
+{
+	"name": "pip_JOIN_TWOTABLES_ORACLE",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "OracleSource",
+						"oracleReaderQuery": "SELECT E.SRC_EMPLOYEE_ID,E.SRC_FIRST_NAME,E.SRC_LAST_NAME,E.SRC_DEPARTMENT_ID,D.DEPARTMENT_NAME,D.MANAGER_ID,D.LOCATION_ID  FROM HR.TGT_EMP_DEPT_DT E\nINNER JOIN HR.DEPARTMENTS D\nON E.SRC_DEPARTMENT_ID = D.DEPARTMENT_ID",
+						"partitionOption": "None",
+						"convertDecimalToInteger": false,
+						"queryTimeout": "02:00:00"
+					},
+					"sink": {
+						"type": "OracleSink",
+						"writeBatchSize": 10000
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Oracle_JOIN_EMP_DEPT",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Oracle_TGT_JOINTWO_TABLES",
+						"type": "DatasetReference",
+						"parameters": {
+							"TGTTABLE": {
+								"value": "@pipeline().parameters.TGT_EMP_DEPT_JOIN",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"TGT_EMP_DEPT_JOIN": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ASSIGNMENTS"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-11-19T03:55:15Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

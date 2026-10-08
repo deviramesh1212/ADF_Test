@@ -1,0 +1,91 @@
+{
+	"name": "pip_onprem_to_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SQL_SERVER_ONPREM",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ADF_TRAIN_ARCHIEVE",
+						"type": "DatasetReference",
+						"parameters": {
+							"CONTAINER": {
+								"value": "@pipeline().parameters.p_container",
+								"type": "Expression"
+							},
+							"ARCHIEVE_DIRECTORY": {
+								"value": "@pipeline().parameters.p_directory",
+								"type": "Expression"
+							},
+							"FILE_NAME": {
+								"value": "@pipeline().parameters.p_file_name",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"p_container": {
+				"type": "string",
+				"defaultValue": "adftraining"
+			},
+			"p_directory": {
+				"type": "string",
+				"defaultValue": "onprem"
+			},
+			"p_file_name": {
+				"type": "string",
+				"defaultValue": "customer_claim.csv"
+			}
+		},
+		"folder": {
+			"name": "ADF_TRAINING_NEW"
+		},
+		"annotations": []
+	}
+}

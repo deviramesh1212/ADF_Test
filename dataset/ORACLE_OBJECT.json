@@ -1,0 +1,16 @@
+{
+	"name": "ORACLE_OBJECT",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Oracle1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "HR",
+			"table": "CLAIM_SRC"
+		}
+	}
+}

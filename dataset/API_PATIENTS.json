@@ -1,0 +1,22 @@
+{
+	"name": "API_PATIENTS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "http_POSTMAN_PATIENT",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": "Sugan2783/DATABRICKS/refs/heads/main/patients.csv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

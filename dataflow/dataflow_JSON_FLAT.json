@@ -1,0 +1,71 @@
+{
+	"name": "dataflow_JSON_FLAT",
+	"properties": {
+		"folder": {
+			"name": "LEARN"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SRC_JSON",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "PARSED_JSON_COPY",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flatten1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AUTHOR_UID as integer,",
+				"          CUST_ID as string,",
+				"          FIRST_NAME as string,",
+				"          MIDDLE_NAME as string,",
+				"          LAST_NAME as string,",
+				"          {CONTACT DETAILS} as ({Permanent address} as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> source1",
+				"source1 foldDown(unroll(CONTACT DETAILS, CONTACT DETAILS),",
+				"     mapColumn(",
+				"          AUTHOR_UID,",
+				"          CUST_ID,",
+				"          FIRST_NAME,",
+				"          MIDDLE_NAME,",
+				"          LAST_NAME,",
+				"          {CONTACT DETAILS} = {CONTACT DETAILS}.{Permanent address}",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flatten1",
+				"flatten1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          COUNTRY_ID as string,",
+				"          COUNTRY_NAME as string,",
+				"          REGION_ID as string",
+				"     ),",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
+}

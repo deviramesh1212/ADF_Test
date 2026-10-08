@@ -1,0 +1,126 @@
+{
+	"name": "PROJECT_STG",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "BlobLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "STG_CUSTOMERS.csv",
+				"folderPath": "target/AzureProject/Stg",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "DATE_KEY",
+				"type": "String"
+			},
+			{
+				"name": "DAY_YYYY_MM_DD",
+				"type": "String"
+			},
+			{
+				"name": "DAY_US_MM_DD_YYYY",
+				"type": "String"
+			},
+			{
+				"name": "DAY_US_LONG",
+				"type": "String"
+			},
+			{
+				"name": "DAY_US_M_D_YY",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_SHORT",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_LONG",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_IN_QUARTER_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_IN_YEAR_SHORT",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_IN_YEAR_LONG",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_WK_QTR_YEAR",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_FROM_TO",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_STARTING",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_WK_YEAR_CONT",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_WK_YEAR",
+				"type": "String"
+			},
+			{
+				"name": "WEEK_WK_QTR_YEAR_CONT",
+				"type": "String"
+			},
+			{
+				"name": "DAY_IN_WEEK_SHORT",
+				"type": "String"
+			},
+			{
+				"name": "DAY_IN_WEEK_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "DAY_IN_WEEK_LONG",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_SHORT",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_NUMBER",
+				"type": "String"
+			},
+			{
+				"name": "MONTH_LONG",
+				"type": "String"
+			},
+			{
+				"name": "QUARTER_SHORT_US",
+				"type": "String"
+			},
+			{
+				"name": "YEAR",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

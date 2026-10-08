@@ -1,0 +1,66 @@
+{
+	"name": "dataflow_PROMOTION_STG_DB",
+	"properties": {
+		"folder": {
+			"name": "ASSIGNMENT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DelimitedText_PROMOTION",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureSqlTable_PROMOTION_STG",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          PROMOTION_ID as integer,",
+				"          PROMOTION_NAME as string,",
+				"          PROMOTION_TYPE as string,",
+				"          DISCOUNT_AMOUNT as string,",
+				"          START_DATE as date,",
+				"          END_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(DISCOUNT_AMOUNT = replace(DISCOUNT_AMOUNT,'%','')) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          PROMOTION_ID,",
+				"          PROMOTION_NAME,",
+				"          PROMOTION_TYPE,",
+				"          DISCOUNT_AMOUNT,",
+				"          START_DATE,",
+				"          END_DATE",
+				"     )) ~> sink1"
+			]
+		}
+	}
+}

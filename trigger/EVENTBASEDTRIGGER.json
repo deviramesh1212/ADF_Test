@@ -1,0 +1,24 @@
+{
+	"name": "EVENTBASEDTRIGGER",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pip_wildcard_copy1",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/data/blobs/source/SOURCEFILE",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/6cda72ae-09db-4ac7-a49f-757ca002a156/resourceGroups/SUGANTHI_RGROUP/providers/Microsoft.Storage/storageAccounts/suganthistoragenew",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}

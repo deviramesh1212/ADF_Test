@@ -1,0 +1,60 @@
+{
+	"name": "AzureSql_LOCATION",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "LOCATION_DIM_KEY",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "STORE_LOCATION_ID",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "STORE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STORE_ADDRESS",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STORE_PHONE_NUMBER",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STORE_OPEN_TIME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STORE_CLOSE_TIME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STATE_NAME",
+				"type": "nvarchar"
+			},
+			{
+				"name": "STATE_COUNTRY",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CREATE_USER_DATE",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "hr",
+			"table": "LOCATIONS_DIM"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

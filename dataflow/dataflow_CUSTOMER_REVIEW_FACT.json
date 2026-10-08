@@ -1,0 +1,197 @@
+{
+	"name": "dataflow_CUSTOMER_REVIEW_FACT",
+	"properties": {
+		"folder": {
+			"name": "PROJECT_DATAFLOW"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "MEMBER_LOYALTY",
+						"type": "DatasetReference"
+					},
+					"name": "MEMBERLOYALTY"
+				},
+				{
+					"dataset": {
+						"referenceName": "CUSTOMER_DIM",
+						"type": "DatasetReference"
+					},
+					"name": "CUSTOMERDIM"
+				},
+				{
+					"dataset": {
+						"referenceName": "STORE_LOCATION_DIM",
+						"type": "DatasetReference"
+					},
+					"name": "STORELOACTION"
+				},
+				{
+					"dataset": {
+						"referenceName": "DATE_PROJ",
+						"type": "DatasetReference"
+					},
+					"name": "DATEDIM"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "CUST_REVIEW_FACT",
+						"type": "DatasetReference"
+					},
+					"name": "CUSTREVEWFACT"
+				}
+			],
+			"transformations": [
+				{
+					"name": "join1"
+				},
+				{
+					"name": "join2"
+				},
+				{
+					"name": "join3"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          MEMBER_ID as integer,",
+				"          ORDER_DATE as date,",
+				"          INITIAL_POINTS_RECEIVED_DATE as date,",
+				"          INITIAL_REWARD_POINTS as short,",
+				"          LAST_EARNED_POINTS as integer,",
+				"          TOTAL_POINTS_EARNED as integer,",
+				"          REMAINING_POINTS as integer,",
+				"          IS_ACTIVE as boolean,",
+				"          STORE_LOCATION_ID as integer,",
+				"          ORDER_ID as integer,",
+				"          CUSTOMER_ID as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     partitionBy('hash', 1)) ~> MEMBERLOYALTY",
+				"source(output(",
+				"          CUSTOMER_DIM_KEY as integer,",
+				"          CUSTOMER_ID as integer,",
+				"          CUSTOMER_FIRST_NAME as string,",
+				"          CUSTOMER_LAST_NAME as string,",
+				"          IS_LOYAL as string,",
+				"          PRIMARY_EMAIL as string,",
+				"          SECONDARY_EMAIL as string,",
+				"          PRIMARY_PHONE_NUMBER as string,",
+				"          SECONDARY_PHONE_NUMBER as string,",
+				"          R_Address_Lane1 as string,",
+				"          R_Address_Lane_2 as string,",
+				"          R_City_Name as string,",
+				"          R_State_Name as string,",
+				"          R_Country_Name as string,",
+				"          R_Zip_Code as string,",
+				"          R_Gate_Code as string,",
+				"          O_ADDRESS_LANE1 as string,",
+				"          O_ADDRESS_LANE2 as string,",
+				"          O_CITY_NAME as string,",
+				"          O_STATE_NAME as string,",
+				"          O_COUNTRY_NAME as string,",
+				"          O_ZIP_CODE as string,",
+				"          O_GATE_CODE as string,",
+				"          JOINING_DATE as date,",
+				"          STG_CREATE_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> CUSTOMERDIM",
+				"source(output(",
+				"          Loc_Dim_Key as integer,",
+				"          Store_Location_ID as integer,",
+				"          Store_Name as string,",
+				"          Store_Address as string,",
+				"          Store_Open_Time as string,",
+				"          Store_Close_Time as string,",
+				"          State_Name as string,",
+				"          FLAG as string,",
+				"          DM_CREATE_DATE as date",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> STORELOACTION",
+				"source(output(",
+				"          DATE_KEY as integer,",
+				"          DAY_YYYY_MM_DD as string,",
+				"          DAY_US_MM_DD_YYYY as date,",
+				"          DAY_US_LONG as string,",
+				"          DAY_US_M_D_YY as string,",
+				"          WEEK_SHORT as string,",
+				"          WEEK_NUMBER as short,",
+				"          WEEK_LONG as string,",
+				"          MONTH_IN_QUARTER_NUMBER as string,",
+				"          MONTH_IN_YEAR_SHORT as string,",
+				"          MONTH_IN_YEAR_LONG as string,",
+				"          WEEK_WK_QTR_YEAR as string,",
+				"          WEEK_FROM_TO as string,",
+				"          WEEK_STARTING as string,",
+				"          WEEK_WK_YEAR_CONT as string,",
+				"          WEEK_WK_YEAR as string,",
+				"          WEEK_WK_QTR_YEAR_CONT as string,",
+				"          DAY_IN_WEEK_SHORT as string,",
+				"          DAY_IN_WEEK_NUMBER as short,",
+				"          DAY_IN_WEEK_LONG as string,",
+				"          MONTH_SHORT as string,",
+				"          MONTH_NUMBER as string,",
+				"          MONTH_LONG as string,",
+				"          QUARTER_SHORT_US as string,",
+				"          YEAR as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> DATEDIM",
+				"MEMBERLOYALTY, CUSTOMERDIM join(MEMBERLOYALTY@CUSTOMER_ID == CUSTOMERDIM@CUSTOMER_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
+				"join1, STORELOACTION join(MEMBERLOYALTY@STORE_LOCATION_ID == STORELOACTION@Store_Location_ID,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join2",
+				"join2, DATEDIM join(ORDER_DATE == DAY_US_MM_DD_YYYY,",
+				"     joinType:'inner',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join3",
+				"join3 derive(DIM_CREATE_DATE = currentDate()) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          MEMBER_ID,",
+				"          TOTAL_POINTS_EARNED,",
+				"          REMAINING_POINTS,",
+				"          IS_ACTIVE,",
+				"          STORE_LOCATION_ID = MEMBERLOYALTY@STORE_LOCATION_ID,",
+				"          CUSTOMER_DIM_KEY,",
+				"          DATE_KEY,",
+				"          DIM_CREATE_DATE",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['CUSTOMER_REVIEW_FACT.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> CUSTREVEWFACT"
+			]
+		}
+	}
+}

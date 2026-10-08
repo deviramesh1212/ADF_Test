@@ -1,0 +1,97 @@
+{
+	"name": "pip_FILE_NAME_PRAC",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"additionalColumns": [
+							{
+								"name": "File_Name",
+								"value": "$$FILENAME"
+							}
+						],
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "sourcedataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"SRCPARAMDATA": {
+								"value": "@pipeline().parameters.SRC_FILE_NAME",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "sinkdataset",
+						"type": "DatasetReference",
+						"parameters": {
+							"PARAMDATASET": {
+								"value": "@pipeline().parameters.TGT_FILE_NAME",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"SRC_FILE_NAME": {
+				"type": "string"
+			},
+			"TGT_FILE_NAME": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ORACLE_HR"
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-10-26T03:59:34Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

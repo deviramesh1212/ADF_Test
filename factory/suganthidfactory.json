@@ -1,0 +1,9 @@
+{
+	"name": "suganthidfactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "9903cbfc-bb8a-4e72-b48a-6c1cf30139ba",
+		"tenantId": "7cab9538-efe8-4dfb-bc5f-095c2b850a43"
+	}
+}

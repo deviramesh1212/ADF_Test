@@ -1,0 +1,99 @@
+{
+	"name": "Pipeline2",
+	"properties": {
+		"parameters": {
+			"p_filePath": {
+				"type": "String"
+			},
+			"p_targetTable": {
+				"type": "String"
+			},
+			"p_validationRules": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "SourceFile",
+					"dataset": {
+						"referenceName": "DS_ADLS_Generic",
+						"type": "DatasetReference"
+					},
+					"sourceRetryCount": 3,
+					"sourceRetryWait": 5,
+					"type": "DelimitedTextSource",
+					"datasetParameters": {
+						"filePath": "@{dataflowParameters.p_filePath}"
+					}
+				}
+			],
+			"sinks": [
+				{
+					"name": "Sink_Valid",
+					"dataset": {
+						"referenceName": "DS_SQL_Generic",
+						"type": "DatasetReference"
+					},
+					"datasetParameters": {
+						"tableName": "@{dataflowParameters.p_targetTable}"
+					},
+					"type": "SqlSink"
+				},
+				{
+					"name": "Sink_Invalid",
+					"dataset": {
+						"referenceName": "DS_ADLS_Error",
+						"type": "DatasetReference"
+					},
+					"type": "DelimitedTextSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "ApplyValidation",
+					"type": "DerivedColumn",
+					"derivedColumns": [
+						{
+							"name": "rules",
+							"expression": "fromJson($p_validationRules)"
+						},
+						{
+							"name": "ID_Validation",
+							"expression": "iif(rules.ID.type == 'int', isNull(toInteger(ID)) ? 'Invalid' : 'Valid', 'NA')"
+						},
+						{
+							"name": "Amount_Validation",
+							"expression": "iif(rules.Amount.type == 'decimal', isNull(toDecimal(Amount)) ? 'Invalid' : 'Valid', 'NA')"
+						},
+						{
+							"name": "TxnDate_Validation",
+							"expression": "iif(rules.TxnDate.type == 'date', isNull(toTimestamp(TxnDate, rules.TxnDate.format)) ? 'Invalid' : 'Valid', 'NA')"
+						},
+						{
+							"name": "RowStatus",
+							"expression": "case(ID_Validation == 'Invalid' || Amount_Validation == 'Invalid' || TxnDate_Validation == 'Invalid', 'Invalid', 'Valid')"
+						}
+					]
+				},
+				{
+					"name": "SplitRows",
+					"type": "ConditionalSplit",
+					"conditions": [
+						{
+							"name": "ValidRows",
+							"condition": "RowStatus == 'Valid'"
+						},
+						{
+							"name": "InvalidRows",
+							"condition": "RowStatus == 'Invalid'"
+						}
+					]
+				}
+			],
+			"script": ""
+		}
+	}
+}
